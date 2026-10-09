@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Clinic Queue</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <div class="container">
+
+        <h1>Clinic Queue</h1>
+
+        <h2 id="queueNumber"></h2>
+
+        <p id="patientName"></p>
+
+        <p id="joinTime"></p>
+
+        <p id="status"></p>
+
+    </div>
+
+    <script>
+
+        const patient =
+            JSON.parse(localStorage.getItem("currentPatient"));
+
+        if (patient) {
+
+            document.getElementById("queueNumber").textContent =
+                "Queue Number: " + patient.queueNumber;
+
+            document.getElementById("patientName").textContent =
+                "Patient: " +
+                patient.firstName +
+                " " +
+                patient.lastName;
+
+            document.getElementById("joinTime").textContent =
+                "Joined Queue: " +
+                patient.joinedTime;
+
+            document.getElementById("status").textContent =
+                "Status: " +
+                patient.status;
+        }
+
+    </script>
+
+</body>
+
+</html>

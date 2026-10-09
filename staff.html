@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Staff Queue</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <div class="staff-container">
+
+        <h1>Clinic Staff Queue</h1>
+
+        <div id="queueList"></div>
+
+    </div>
+
+    <script>
+
+        function getUrgencyValue(urgency) {
+            if (urgency === "High") {
+                return 3;
+            }
+
+            if (urgency === "Medium") {
+                return 2;
+            }
+            return 1;
+        }
+
+        function sortQueue(queue) {
+
+            queue.sort(function(a, b) {
+
+                // First sort by urgency
+                const urgencyDifference =
+                    getUrgencyValue(b.urgency) -
+                    getUrgencyValue(a.urgency);
+
+                if (urgencyDifference !== 0) {
+                    return urgencyDifference;
+                }
+
+
+                // If urgency is the same,
+                // sort by arrival time
+                return a.joinedTimestamp - b.joinedTimestamp;
+
+            });
+
+            return queue;
+        }
+
+        function displayQueue() {
+
+            let activeQueue =
+                JSON.parse(localStorage.getItem("activeQueue")) || [];
+
+            // FEATURE 4:
+            // Sort by urgency, then arrival time
+            activeQueue = sortQueue(activeQueue);
+
+            // Save sorted queue
+            localStorage.setItem(
+                "activeQueue",
+                JSON.stringify(activeQueue)
+            );
+
+            const queueList =
+                document.getElementById("queueList");
+
+            queueList.innerHTML = "";
+
+            if (activeQueue.length === 0) {
+
+                queueList.innerHTML =
+                    "<p>No patients are currently waiting.</p>";
+
+                return;
+            }
+
+            activeQueue.forEach(function(patient, index) {
+
+                const patientCard =
+                    document.createElement("div");
+
+                patientCard.className = "patient-card";
+
+                patientCard.innerHTML = `
+
+                    <h3>
+                        Queue #${patient.queueNumber}
+                    </h3>
+
+                    <p>
+                        <strong>Patient:</strong>
+                        ${patient.firstName} ${patient.lastName}
+                    </p>
+
+                    <p>
+                        <strong>Reason:</strong>
+                        ${patient.reason}
+                    </p>
+
+                    <p>
+                        <strong>Joined:</strong>
+                        ${patient.joinedTime}
+                    </p>
+
+                    <p>
+                        <strong>Status:</strong>
+                        ${patient.status}
+                    </p>
+
+                    <p>
+                        <strong>Urgency:</strong>
+                        <span class="urgency">
+                            ${patient.urgency}
+                        </span>
+                    </p>
+
+                    <label>
+                        Change Urgency:
+                    </label>
+
+                    <select
+                        onchange="changeUrgency(${index}, this.value)"
+                    >
+
+                        <option
+                            value="Low"
+                            ${patient.urgency === "Low" ? "selected" : ""}
+                        >
+                            Low
+                        </option>
+
+                        <option
+                            value="Medium"
+                            ${patient.urgency === "Medium" ? "selected" : ""}
+                        >
+                            Medium
+                        </option>
+
+                        <option
+                            value="High"
+                            ${patient.urgency === "High" ? "selected" : ""}
+                        >
+                            High
+                        </option>
+
+                    </select>
+
+                `;
+
+                queueList.appendChild(patientCard);
+
+            });
+
+        }
+
+        function changeUrgency(index, newUrgency) {
+
+            let activeQueue =
+                JSON.parse(localStorage.getItem("activeQueue")) || [];
+
+
+            activeQueue[index].urgency = newUrgency;
+
+            localStorage.setItem(
+                "activeQueue",
+                JSON.stringify(activeQueue)
+            );
+
+            // Re-display queue so it gets sorted again
+            displayQueue();
+        }
+
+        displayQueue();
+
+    </script>
+
+</body>
+
+</html>
